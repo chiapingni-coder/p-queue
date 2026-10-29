@@ -1,0 +1,11 @@
+{
+  "schema": "RELEASEBRIDGE_PR_FREEZE_POLICY_V1",
+  "repo": "chiapingni-coder/p-queue",
+  "base_ref": "rb-pqueue-fix-baseline",
+  "protected_paths": [
+    {
+      "path": "source/index.ts",
+      "blob": "3f47eddcdeed7b5e1a669635a2d9d49fd56cb798"
+    }
+  ]
+}
