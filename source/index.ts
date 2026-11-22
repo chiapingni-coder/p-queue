@@ -159,7 +159,20 @@ export default class PQueue<QueueType extends Queue<RunFunction, EnqueueOptionsT
 		super();
 
 		// Node.js warns when an event has more than 10 listeners, but many waiters, like `.onIdle()` calls, are normal. Not imported from `node:events`, so it still works in browsers.
-		globalThis.process?.getBuiltinModule?.('node:events')?.setMaxListeners(Infinity, this); // eslint-disable-line n/prefer-global/process
+		const events = globalThis.process?.getBuiltinModule?.('node:events'); // eslint-disable-line n/prefer-global/process
+		try {
+			events?.setMaxListeners(Infinity, this);
+		} catch (error) {
+			// A DOM implementation such as jsdom is not a Node.js EventTarget. Ignore only Node's rejection of that target, not other setup errors.
+			const nodeError = error as {code?: unknown; message?: unknown} | undefined;
+			if (
+				nodeError?.code !== 'ERR_INVALID_ARG_TYPE'
+				|| typeof nodeError.message !== 'string'
+				|| !nodeError.message.startsWith('The "eventTargets" argument must be an instance of EventEmitter or EventTarget.')
+			) {
+				throw error;
+			}
+		}
 
 		// Defaults in destructuring also apply to an option that is `undefined`, like `{concurrency: options.concurrency}` without a value.
 		const {
